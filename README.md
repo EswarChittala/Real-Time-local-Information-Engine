@@ -121,3 +121,62 @@ Render for initial backend deployment
 
 Use a modular monolith initially. Do NOT start with microservices, Kafka, Kubernetes, Redis, Celery, RabbitMQ or other infrastructure unless a later measured requirement justifies it.
 
+---
+
+## 7. Quickstart & Local Setup
+
+```bash
+# 1. Clone repository
+git clone https://github.com/EswarChittala/Real-Time-local-Information-Engine.git
+cd Real-Time-local-Information-Engine
+
+# 2. Setup virtual environment
+python -m venv venv
+.\venv\Scripts\activate   # Windows
+# source venv/bin/activate # Linux/macOS
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run database migrations
+alembic upgrade head
+
+# 5. Run test suite
+pytest
+
+# 6. Launch development server
+uvicorn app.main:app --reload --port 8000
+```
+
+- **Health check**: `http://localhost:8000/health`
+- **Swagger Docs**: `http://localhost:8000/docs`
+- **Engine Summary**: `http://localhost:8000/summary`
+
+---
+
+## 8. API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Healthcheck returning status & version |
+| `POST` | `/observations` | Submit a real-world observation (TRAFFIC, SHOP, ROAD, WATER, POWER) |
+| `GET` | `/observations/search` | Search observations by category, location, and freshness |
+| `POST` | `/questions` | Ask a hyperlocal question; retrieves observations & calculates consensus |
+| `POST` | `/webhooks/whatsapp` | Twilio WhatsApp incoming webhook channel adapter |
+| `POST` | `/notifications/preferences` | Set user category and location notification preferences |
+| `GET` | `/notifications/user/{phone}` | View notification history for a user |
+| `GET` | `/summary` | High-level engine metrics and real-time category statistics |
+
+---
+
+## 9. Production Deployment
+
+### Option A: Render (1-Click Deployment)
+The repository includes a `render.yaml` blueprint. Link your GitHub repository in Render to deploy automatically with Alembic migrations and zero-downtime health checks.
+
+### Option B: Docker
+```bash
+docker build -t hyperlocal-engine:latest .
+docker run -p 8000:8000 -e DATABASE_URL="postgresql://..." hyperlocal-engine:latest
+```
+
