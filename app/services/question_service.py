@@ -86,6 +86,21 @@ class QuestionService:
         )
         saved_q = self.question_repo.create(q)
 
+        # 7. Verification Workflow (Section 13)
+        if consensus.status == "UNKNOWN" and location_id:
+            from app.services.verification_service import VerificationService
+            verif_service = VerificationService(self.db)
+            verifiers_contacted = verif_service.request_verification(
+                question_id=saved_q.id,
+                category=category,
+                location_id=location_id,
+                requester_id=user.id
+            )
+            if verifiers_contacted > 0:
+                answer += f" Fresh verification requested from {verifiers_contacted} nearby contributor(s)."
+                saved_q.answer_text = answer
+                self.db.commit()
+
         # Serialize observations for response
         obs_reads = [ObservationRead.model_validate(obs) for obs in observations]
 

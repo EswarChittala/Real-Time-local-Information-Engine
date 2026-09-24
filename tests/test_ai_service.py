@@ -1,4 +1,3 @@
-import pytest
 from app.services.ai_service import AIService, AIParsedIntent
 
 def test_regional_heauristics_telugu_english_traffic():
