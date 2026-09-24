@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import health, observations, questions, whatsapp
+from app.api.routes import health, observations, questions, whatsapp, notifications
 from app.core.config import settings
 
 app = FastAPI(
@@ -13,6 +13,7 @@ app.include_router(health.router)
 app.include_router(observations.router)
 app.include_router(questions.router)
 app.include_router(whatsapp.router)
+app.include_router(notifications.router)
 
 @app.get("/")
 def root():

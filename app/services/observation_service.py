@@ -44,7 +44,14 @@ class ObservationService:
             expires_at=data.expires_at
         )
 
-        return self.obs_repo.create(obs)
+        saved_obs = self.obs_repo.create(obs)
+
+        # 4. Trigger notifications for opted-in users (Section 14)
+        from app.services.notification_service import NotificationService
+        notif_service = NotificationService(self.db)
+        notif_service.process_observation_notifications(saved_obs)
+
+        return saved_obs
 
     def search_observations(
         self,
