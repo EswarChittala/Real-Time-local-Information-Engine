@@ -16,7 +16,15 @@ class LocationService:
                 return loc
             return self.repo.get_or_create(location_name)
         if text:
-            return self.repo.find_in_text(text)
+            found = self.repo.find_in_text(text)
+            if found:
+                return found
+            # Extract pattern: "near Begumpet", "in Begumpet", "at Begumpet", "around Begumpet"
+            import re
+            match = re.search(r'\b(?:near|at|in|around)\s+([A-Za-z0-9\-]+)', text, re.IGNORECASE)
+            if match:
+                extracted_name = match.group(1).strip().capitalize()
+                return self.repo.get_or_create(extracted_name)
         return None
 
     def get_or_create(self, name: str) -> Location:
